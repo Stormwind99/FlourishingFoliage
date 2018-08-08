@@ -2,6 +2,7 @@ package com.wumple.flourishingfoilage;
 
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Name;
+import net.minecraftforge.common.config.Config.RangeInt;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -11,6 +12,26 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Mod.EventBusSubscriber(modid = Reference.MOD_ID)
 public class ModConfig
 {
+    @Name(value = "Regrow Settings")
+    @Config.Comment(value = "Settings related to regrow like rate, light level, grow outward")
+    public static final RegrowSettings regrowSettings = new RegrowSettings();
+
+    public static class RegrowSettings
+    {
+        @Name("Leaf regrow rate")
+        @Config.Comment("Time leaves take to regrow on average, in seconds.")
+        @RangeInt(min = 0)
+        public int leafRegrowthRate = 180;
+
+        @Name("Light required to grow")
+        @Config.Comment("Light level required for leaves to start regrowing. 0 = no light required.")
+        @RangeInt(min = 0, max = 15)
+        public int lightRequiredToGrow = 9;
+
+        @Name("Grow outward")
+        @Config.Comment("Must leaves grow next to other leaves or logs (aka \"can sustain leaves\") to regrow")
+        public boolean growOutward = true;
+    }
 
     @Name("Debugging")
     @Config.Comment("Debugging options")
