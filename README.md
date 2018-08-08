@@ -1,4 +1,4 @@
-# ExampleMod
+# FlourishingFoilage
 
 This is an automated Minecraft Forge mod template.
 
