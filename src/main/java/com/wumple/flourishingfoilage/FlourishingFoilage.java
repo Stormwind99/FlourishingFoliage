@@ -37,6 +37,7 @@ public class FlourishingFoilage extends ModBase
     public void preInit(FMLPreInitializationEvent event)
     {
         super.preInit(event);
+        MinecraftForge.EVENT_BUS.register(getManager());
     }
 
     @EventHandler
@@ -51,7 +52,6 @@ public class FlourishingFoilage extends ModBase
     public void postInit(FMLPostInitializationEvent event)
     {
         super.postInit(event);
-        MinecraftForge.EVENT_BUS.register(getManager());
     }
 
     @EventHandler

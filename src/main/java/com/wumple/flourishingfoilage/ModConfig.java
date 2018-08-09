@@ -42,6 +42,10 @@ public class ModConfig
         @Name("Debug mode")
         @Config.Comment("Enable debug features on this menu, display extra debug info.")
         public boolean debug = false;
+        
+        @Name("Debug time modifier")
+        @Config.Comment("Modify regrow speed in debug mode")
+        public double regrowModifier = 1.0;
     }
 
     @Mod.EventBusSubscriber(modid = Reference.MOD_ID)

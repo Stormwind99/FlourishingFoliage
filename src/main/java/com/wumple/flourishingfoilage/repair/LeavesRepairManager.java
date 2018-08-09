@@ -3,8 +3,8 @@ package com.wumple.flourishingfoilage.repair;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.wumple.flourishingfoilage.ModConfig;
-import com.wumple.util.blockrepair.BlockRepairManager;
 import com.wumple.util.blockrepair.BlockRepairingBlock;
+import com.wumple.util.blockrepair.RepairManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class LeavesRepairManager extends BlockRepairManager
+public class LeavesRepairManager extends RepairManager
 {
     public static final int TICKS_PER_SECOND = 20;
 
@@ -38,7 +38,12 @@ public class LeavesRepairManager extends BlockRepairManager
         int min = ModConfig.regrowSettings.leafRegrowthRate / 2;
         int max = ModConfig.regrowSettings.leafRegrowthRate * 3 / 2;
         int seconds = ThreadLocalRandom.current().nextInt(min, max);
-        return TICKS_PER_SECOND * seconds;
+        int ticks = TICKS_PER_SECOND * seconds;
+        if (ModConfig.zdebugging.debug)
+        {
+            ticks = (int)((double)ticks * ModConfig.zdebugging.regrowModifier);
+        }
+        return ticks;
     }
     
     public boolean isLeaves(Block block, IBlockState blockstate, World world, BlockPos pos)

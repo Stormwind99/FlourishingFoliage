@@ -32,6 +32,9 @@ public class TileEntityLeavesRepairing extends TileEntityRepairingBlock
         
         // try again later
         setTicksToRepair(getWorld(), LeavesRepairManager.getRandomTicksToRepair());
+        
+        // TODO - stop trying eventually and delete ourselves
+        
         markDirty();
     }
 }
