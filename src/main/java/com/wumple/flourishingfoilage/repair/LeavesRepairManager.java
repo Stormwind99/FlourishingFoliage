@@ -11,6 +11,7 @@ import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -71,10 +72,11 @@ public class LeavesRepairManager extends RepairManager
         {
             if (isTemporaryBreak(player))
             {
+                // replace with repairing block
                 this.replaceBlock(world, blockstate, pos, getRandomTicksToRepair());
                 
-                // MAYBE consider harvesting
-                //block.harvestBlock(world, player, pos, blockstate, null, ItemStack.EMPTY);
+                // harvest original block
+                block.harvestBlock(world, player, pos, blockstate, null, ItemStack.EMPTY);
                 
                 // don't handle event later since we did handled it
                 event.setCanceled(true);
