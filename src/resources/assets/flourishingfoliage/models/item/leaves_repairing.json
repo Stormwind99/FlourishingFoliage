@@ -1,5 +1,5 @@
 {
-  "parent": "flourishingfoilage:block/leaves_repairing",
+  "parent": "flourishingfoliage:block/leaves_repairing",
   "display": {
     "thirdperson": {
       "rotation": [

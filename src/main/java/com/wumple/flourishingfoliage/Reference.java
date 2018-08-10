@@ -1,4 +1,4 @@
-package com.wumple.flourishingfoilage;
+package com.wumple.flourishingfoliage;
 
 public class Reference
 {
@@ -16,8 +16,8 @@ public class Reference
 
     /*
     // debugger settings since no Gradle string replacement
-    public static final String MOD_ID = "flourishingfoilage";
-    public static final String MOD_NAME = "FlourishingFoilage";
+    public static final String MOD_ID = "flourishingfoliage";
+    public static final String MOD_NAME = "FlourishingFoliage";
     public static final String BUILD = "99";
     public static final String MOD_VERSION = "9.9.9";
     public static final String DEPENDENCIES = "required-after:wumpleutil@[2.11,)";

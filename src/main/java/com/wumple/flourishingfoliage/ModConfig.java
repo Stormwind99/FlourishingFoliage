@@ -1,4 +1,4 @@
-package com.wumple.flourishingfoilage;
+package com.wumple.flourishingfoliage;
 
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Name;

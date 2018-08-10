@@ -1,6 +1,6 @@
-package com.wumple.flourishingfoilage.repair;
+package com.wumple.flourishingfoliage.repair;
 
-import com.wumple.flourishingfoilage.ModConfig;
+import com.wumple.flourishingfoliage.ModConfig;
 import com.wumple.util.blockrepair.BlockRepairingBlock;
 
 import net.minecraft.block.state.IBlockState;

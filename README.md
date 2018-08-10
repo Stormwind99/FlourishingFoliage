@@ -1,21 +1,11 @@
-# FlourishingFoilage
+# FlourishingFoliage
 
-This is an automated Minecraft Forge mod template.
+Minecraft mod: Can't keep a tree down! Tree leaves regrow outward after harvesting if enough tree trunk is left.
 
-Expected directory structure before run:
-* newmod.sh (from Git repo other/util/newmod.sh)
-* newmod (optional)
-   * newmod.cfg (from Git repo other/util/newmod.cfg with options you've modified)
-   * private.properties (optional)
+## Features
 
-Running ```newmod.sh NewMod``` will then create:
-
-* NewModWorkspace
-   * NewMod (local git repo for new mod with remote origin set)
-      * (expected base Mod files)
-      * Modify build.properties and private.properties
-   * NewMod.wiki (local git repo for new mod's wiki with remote origin set)
-
-## Notes
-
-* To debug, '''cp build/resources/main/mcmod.info src/resources/mcmod.info''' beforehand since debugger does not run build with gradle string replacement.  Then '''git checkout src/resources/mcmod.info''' afterward to revert back to generated mcmod.info template.
+* Breaking a tree's leaves will trigger potential regrowth of those leaves after a delay in time.
+* Leaves must regrow where they can be sustained (near tree wood or other leaves with a minimum light level).
+* If a block's regrowth is blocked for over a game year, the tree will give up trying to regrow those leaves.
+* Supports all mods trees that are identified as leaves to Minecraft (via Block.isLeaves or instanceof BlockLeaves).
+* All settings for above features are configurable - grow outward, leaf regrow rate, light required to regrow, time to give up.

@@ -1,9 +1,9 @@
-package com.wumple.flourishingfoilage;
+package com.wumple.flourishingfoliage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.wumple.flourishingfoilage.repair.LeavesRepairManager;
+import com.wumple.flourishingfoliage.repair.LeavesRepairManager;
 import com.wumple.util.mod.ModBase;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -16,10 +16,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, dependencies = Reference.DEPENDENCIES,
         updateJSON = Reference.UPDATEJSON, certificateFingerprint = Reference.FINGERPRINT)
-public class FlourishingFoilage extends ModBase
+public class FlourishingFoliage extends ModBase
 {
     @Mod.Instance(Reference.MOD_ID)
-    public static FlourishingFoilage instance;
+    public static FlourishingFoliage instance;
     
     protected LeavesRepairManager manager = null;
     

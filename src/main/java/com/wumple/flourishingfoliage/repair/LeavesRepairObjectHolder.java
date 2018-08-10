@@ -1,4 +1,4 @@
-package com.wumple.flourishingfoilage.repair;
+package com.wumple.flourishingfoliage.repair;
 
 import com.wumple.util.misc.RegistrationHelpers;
 
@@ -11,16 +11,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraftforge.registries.IForgeRegistry;
 
-@ObjectHolder("flourishingfoilage")
+@ObjectHolder("flourishingfoliage")
 public class LeavesRepairObjectHolder
 {
     // ----------------------------------------------------------------------
     // Blocks, Items, etc.
 
-    //@ObjectHolder("flourishingfoilage:leaves_repairing")
+    //@ObjectHolder("flourishingfoliage:leaves_repairing")
     public static /*final*/ Block blockRepairing = null;
 
-    //@ObjectHolder("flourishingfoilage:leaves_repairing")
+    //@ObjectHolder("flourishingfoliage:leaves_repairing")
     public static /*final*/ ItemBlock itemBlockRepairing = null;
 
     // ----------------------------------------------------------------------
@@ -34,7 +34,7 @@ public class LeavesRepairObjectHolder
         {
             final IForgeRegistry<Block> registry = event.getRegistry();
 
-            blockRepairing = RegistrationHelpers.regHelper(registry, new BlockLeavesRepairing(), "flourishingfoilage:leaves_repairing");
+            blockRepairing = RegistrationHelpers.regHelper(registry, new BlockLeavesRepairing(), "flourishingfoliage:leaves_repairing");
         }
         
         @SubscribeEvent
@@ -49,7 +49,7 @@ public class LeavesRepairObjectHolder
     
         public static void registerTileEntities()
         {
-            RegistrationHelpers.registerTileEntity(TileEntityLeavesRepairing.class, "flourishingfoilage:leaves_repairing");
+            RegistrationHelpers.registerTileEntity(TileEntityLeavesRepairing.class, "flourishingfoliage:leaves_repairing");
         }
     }
 }
