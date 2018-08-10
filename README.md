@@ -1,5 +1,5 @@
 # FlourishingFoliage 
-[![](http://cf.way2muchnoise.eu/short_300450.svg)](https://minecraft.curseforge.com/projects/flourishing-foliage) [![](http://cf.way2muchnoise.eu/versions/For_300450.svg)](https://minecraft.curseforge.com/projects/flourishing-foliage)
+[![](http://cf.way2muchnoise.eu/short_300450.svg)](https://minecraft.curseforge.com/projects/flourishing-foliage) [![](http://cf.way2muchnoise.eu/versions/For_300450_all.svg)](https://minecraft.curseforge.com/projects/flourishing-foliage)
 
 Minecraft mod: Can't keep a tree down! Tree leaves regrow outward after harvesting if enough tree trunk is left.
 
