@@ -19,7 +19,7 @@ public class ModConfig
     public static class RegrowSettings
     {
         @Name("Leaf regrow rate")
-        @Config.Comment("Time leaves take to regrow on average, in seconds.")
+        @Config.Comment("Seconds between trying or re-trying leaf regrowth.")
         @RangeInt(min = 0)
         public int leafRegrowthRate = 180;
 
@@ -31,6 +31,11 @@ public class ModConfig
         @Name("Grow outward")
         @Config.Comment("Must leaves grow next to other leaves or logs (aka \"can sustain leaves\") to regrow")
         public boolean growOutward = true;
+        
+        @Name("Time to give up")
+        @Config.Comment("Seconds until giving up on regrowth. 0 = never give up.")
+        @RangeInt(min = 0)
+        public int timeToGiveUp = 100800;
     }
 
     @Name("Debugging")

@@ -3,6 +3,7 @@ package com.wumple.flourishingfoilage.repair;
 import com.wumple.flourishingfoilage.ModConfig;
 import com.wumple.util.blockrepair.TileEntityRepairingBlock;
 import com.wumple.util.misc.LeafUtil;
+import com.wumple.util.misc.TimeUtil;
 
 import net.minecraft.util.math.BlockPos;
 
@@ -15,13 +16,24 @@ public class TileEntityLeavesRepairing extends TileEntityRepairingBlock
     }
     
     @Override
+    public long getExpirationTimeLength()
+    {
+        long ticks = ModConfig.regrowSettings.timeToGiveUp * TimeUtil.TICKS_PER_SECOND;
+        if (ModConfig.zdebugging.debug)
+        {
+            ticks = (long)((double)ticks * ModConfig.zdebugging.regrowModifier);
+        }
+        return ticks;
+    }
+    
+    @Override
     protected boolean canRepairBlock()
     {
         return(
                 super.canRepairBlock()
                 && getWorld().isAreaLoaded(getPos(), 1)
                 && isEnoughLight(getPos())
-                && LeafUtil.canLeavesGrowAtLocation(getWorld(), getPos()) 
+                && ((!ModConfig.regrowSettings.growOutward) || LeafUtil.canLeavesGrowAtLocation(getWorld(), getPos())) 
                 );
     }
     
@@ -30,11 +42,12 @@ public class TileEntityLeavesRepairing extends TileEntityRepairingBlock
     {
         super.onCantRepairBlock();
         
-        // try again later
-        setTicksToRepair(getWorld(), LeavesRepairManager.getRandomTicksToRepair());
-        
-        // TODO - stop trying eventually and delete ourselves
-        
-        markDirty();
+        // if expired, super would mark us invalid
+        if (!isInvalid())
+        {
+            // try again later
+            setTicksToRepair(getWorld(), LeavesRepairManager.getRandomTicksToRepair());
+            markDirty();
+        }
     }
 }
