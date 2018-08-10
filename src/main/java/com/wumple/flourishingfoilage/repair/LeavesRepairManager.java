@@ -11,7 +11,6 @@ import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.BlockEvent;
@@ -37,6 +36,12 @@ public class LeavesRepairManager extends RepairManager
         }
         return ticks;
     }
+
+    @Override
+    public int getTicksToRepair()
+    {
+        return getRandomTicksToRepair();
+    }
     
     public boolean isBlockToRepair(Block block, IBlockState blockstate, World world, BlockPos pos)
     {
@@ -49,30 +54,17 @@ public class LeavesRepairManager extends RepairManager
                 || (player.getHeldItemMainhand().getItem() != Items.SHEARS);
     }
 
-    // idea from LilRichy's RegrowableLeaves EventHandler.breakEvent()
+    @Override
+    public boolean shouldRepair(EntityPlayer player, Block block, IBlockState blockstate, World world, BlockPos pos)
+    {
+        return isBlockToRepair(block, blockstate, world, pos) && isTemporaryBreak(player);
+    }
+
+    @Override
     @SubscribeEvent
     public void onBreak(BlockEvent.BreakEvent event)
     {
-        BlockPos pos = event.getPos();
-        IBlockState blockstate = event.getState();
-        World world = event.getWorld();
-        Block block = blockstate.getBlock();
-        EntityPlayer player = event.getPlayer();
-        
-        if (isBlockToRepair(block, blockstate, world, pos))
-        {
-            if (isTemporaryBreak(player))
-            {
-                // replace with repairing block
-                replaceBlock(world, blockstate, pos, getRandomTicksToRepair());
-                
-                // harvest original block
-                block.harvestBlock(world, player, pos, blockstate, null, ItemStack.EMPTY);
-                
-                // don't handle event later since we did handled it
-                event.setCanceled(true);
-            }
-        }
+        super.onBreak(event);
     }
     
     /*

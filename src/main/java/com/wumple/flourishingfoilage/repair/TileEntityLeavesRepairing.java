@@ -46,8 +46,10 @@ public class TileEntityLeavesRepairing extends TileEntityRepairingBlock
         if (!isInvalid())
         {
             // try again later
-            setTicksToRepair(getWorld(), LeavesRepairManager.getRandomTicksToRepair());
+            int ticks = LeavesRepairManager.getRandomTicksToRepair();
+            setTicksToRepair(getWorld(), ticks);
             markDirty();
+            LeavesRepairManager.log("rescheduling state: " + orig_blockState + " to " + getTimeToRepairAt() + " at " + this.getPos());
         }
     }
 }
