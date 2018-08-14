@@ -21,7 +21,7 @@ public class ModConfig
         @Name("Leaf regrow rate")
         @Config.Comment("Seconds between trying or re-trying leaf regrowth.")
         @RangeInt(min = 0)
-        public int leafRegrowthRate = 180;
+        public int leafRegrowthRate = 1200;
 
         @Name("Light required to grow")
         @Config.Comment("Light level required for leaves to start regrowing. 0 = no light required.")
