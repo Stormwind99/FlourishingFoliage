@@ -3,24 +3,26 @@ package com.wumple.flourishingfoliage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.wumple.flourishingfoliage.repair.LeavesRepairDebug;
 import com.wumple.flourishingfoliage.repair.LeavesRepairManager;
-import com.wumple.util.mod.ModBase;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLFingerprintViolationEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, dependencies = Reference.DEPENDENCIES,
-        updateJSON = Reference.UPDATEJSON, certificateFingerprint = Reference.FINGERPRINT)
-public class FlourishingFoliage extends ModBase
+@Mod(Reference.MOD_ID)
+public class FlourishingFoliage
 {
-    @Mod.Instance(Reference.MOD_ID)
-    public static FlourishingFoliage instance;
-    
+	public Logger getLogger()
+	{
+		return LogManager.getLogger(Reference.MOD_ID);
+	}
+	
     protected LeavesRepairManager manager = null;
     
     public LeavesRepairManager getManager()
@@ -32,38 +34,28 @@ public class FlourishingFoliage extends ModBase
         return manager;
     }
 
-    @EventHandler
-    @Override
-    public void preInit(FMLPreInitializationEvent event)
-    {
-        super.preInit(event);
-        MinecraftForge.EVENT_BUS.register(getManager());
-    }
+	public FlourishingFoliage()
+	{
+		ConfigManager.register(ModLoadingContext.get());
 
-    @EventHandler
-    @Override
-    public void init(FMLInitializationEvent event)
-    {
-        super.init(event);
-    }
+		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+		modEventBus.addListener(this::setup);
 
-    @EventHandler
-    @Override
-    public void postInit(FMLPostInitializationEvent event)
-    {
-        super.postInit(event);
-    }
-
-    @EventHandler
-    @Override
-    public void onFingerprintViolation(FMLFingerprintViolationEvent event)
-    {
-        super.onFingerprintViolation(event);
-    }
-
-    @Override
-    public Logger getLoggerFromManager()
-    {
-        return LogManager.getLogger(Reference.MOD_ID);
-    }
+		// Register ourselves for server and other game events we are interested in
+		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.register(getManager());
+		MinecraftForge.EVENT_BUS.register(new LeavesRepairDebug());
+	}
+	
+	public void setup(final FMLCommonSetupEvent event)
+	{
+	}
+	
+	@SubscribeEvent
+	public void onFingerprintViolation(final FMLFingerprintViolationEvent event)
+	{
+		getLogger().warn("Invalid fingerprint detected! The file " + event.getSource().getName()
+				+ " may have been tampered with. This version will NOT be supported by the author!");
+		getLogger().warn("Expected " + event.getExpectedFingerprint() + " found " + event.getFingerprints().toString());
+	}
 }

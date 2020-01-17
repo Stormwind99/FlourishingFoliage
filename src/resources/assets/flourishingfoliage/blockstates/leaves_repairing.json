@@ -1,9 +1,0 @@
-{
-  "forge_marker": 1,
-  "defaults": {
-    "model": "flourishingfoliage:leaves_repairing"
-  },
-  "variants": {
-    "normal": [{}]
-  }
-}

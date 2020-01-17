@@ -1,33 +1,15 @@
 package com.wumple.flourishingfoliage.repair;
 
-import com.wumple.flourishingfoliage.ModConfig;
 import com.wumple.util.blockrepair.BlockRepairingBlock;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockReader;
 
 public class BlockLeavesRepairing extends BlockRepairingBlock
 {
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
-        return new TileEntityLeavesRepairing();
-    }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        // show debug model if debugging, invisible if not debugging
-        if (ModConfig.zdebugging.debug)
-        {
-            return EnumBlockRenderType.MODEL;
-        }
-        else
-        {
-            return EnumBlockRenderType.INVISIBLE;
-            // MAYBE return super.getRenderType(state);
-        }
-    }
+	@Override
+	public TileEntity createNewTileEntity(IBlockReader worldIn)
+	{
+		return new TileEntityLeavesRepairing();
+	}
 }

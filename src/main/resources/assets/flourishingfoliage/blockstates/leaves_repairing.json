@@ -1,0 +1,10 @@
+{
+  "defaults": {
+    "model": "flourishingfoliage:block/leaves_repairing"
+  },
+  "variants": {
+    "": { 
+    	"model": "flourishingfoliage:block/leaves_repairing"
+    }
+  }
+}

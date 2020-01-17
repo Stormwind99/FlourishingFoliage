@@ -1,6 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "flourishingfoliage:blocks/leaves_repairing"
-  }
-}

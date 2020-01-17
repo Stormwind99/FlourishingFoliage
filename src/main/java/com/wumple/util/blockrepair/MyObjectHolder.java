@@ -1,4 +1,4 @@
-package com.wumple.flourishingfoliage.repair;
+package com.wumple.util.blockrepair;
 
 import com.wumple.flourishingfoliage.Reference;
 
@@ -12,21 +12,24 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder("flourishingfoliage")
-public class LeavesRepairObjectHolder
-{
+@ObjectHolder("wumpleutil")
+public class MyObjectHolder
+{    
     // ----------------------------------------------------------------------
     // Blocks, Items, etc.
 
-    //@ObjectHolder("flourishingfoliage:leaves_repairing")
-    public static /*final*/ Block blockRepairing = null;
+    //@ObjectHolder("wumpleutil:repairing_block")
+    public static /*final*/ Block blockRepairingBlock = null;
 
-    //@ObjectHolder("flourishingfoliage:leaves_repairing")
+    //@ObjectHolder("wumpleutil:blank")
+    public static /*final*/ Block blockBlank = null;
+    
+    //@ObjectHolder("wumpleutil:repairing_block")
     public static /*final*/ BlockItem itemBlockRepairing = null;
     
-    @ObjectHolder("flourishingfoliage:leaves_repairing")
-	public static TileEntityType<TileEntityLeavesRepairing> RepairingBlock_Tile;
-
+    @ObjectHolder("wumpleutil:repairing_block")
+	public static TileEntityType<TileEntityRepairingBlock> RepairingBlock_Tile;
+    
     // ----------------------------------------------------------------------
     // Events
 
@@ -37,13 +40,17 @@ public class LeavesRepairObjectHolder
         public static void registerBlocks(RegistryEvent.Register<Block> event)
         {
             final IForgeRegistry<Block> registry = event.getRegistry();
-
-            blockRepairing = new BlockLeavesRepairing();
-            blockRepairing.setRegistryName("flourishingfoliage:leaves_repairing");
-            registry.register(blockRepairing);
-
+            
+            // used for replacing foliage with blank for shaders
+            blockBlank = new BlockBlank();
+            blockBlank.setRegistryName("wumpleutil:blank");
+            registry.register(blockBlank);
+            
+            blockRepairingBlock = new BlockRepairingBlock();
+            blockRepairingBlock.setRegistryName("wumpleutil:repairing_block");
+            registry.register(blockRepairingBlock);
         }
-        
+    
         @SubscribeEvent
         public static void registerItems(RegistryEvent.Register<Item> event)
         {
@@ -51,18 +58,17 @@ public class LeavesRepairObjectHolder
             
             Item.Properties properties = new Item.Properties();
             
-            itemBlockRepairing = new BlockItem(blockRepairing, properties);
-            itemBlockRepairing.setRegistryName("flourishingfoliage:leaves_repairing");
+            itemBlockRepairing = new BlockItem(blockRepairingBlock, properties);
+            itemBlockRepairing.setRegistryName("wumpleutil:repairing_block");
             
             registry.register(itemBlockRepairing);
         }
-
         
 		@SubscribeEvent
 		public static void onTileEntityRegistry(final RegistryEvent.Register<TileEntityType<?>> event)
 		{
-			event.getRegistry().register(TileEntityType.Builder.create(TileEntityLeavesRepairing::new, blockRepairing)
-					.build(null).setRegistryName("flourishingfoliage:leaves_repairing"));
+			event.getRegistry().register(TileEntityType.Builder.create(TileEntityRepairingBlock::new, blockRepairingBlock)
+					.build(null).setRegistryName("wumpleutil:repairing_block"));
 		}
     }
 }

@@ -2,19 +2,19 @@ package com.wumple.flourishingfoliage.repair;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.wumple.flourishingfoliage.ModConfig;
+import com.wumple.flourishingfoliage.ConfigManager;
 import com.wumple.util.blockrepair.RepairManager;
+import com.wumple.util.misc.LeafUtil2;
 import com.wumple.util.misc.TimeUtil;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class LeavesRepairManager extends RepairManager
 {
@@ -26,14 +26,11 @@ public class LeavesRepairManager extends RepairManager
 
     public static int getRandomTicksToRepair()
     {
-        int min = ModConfig.regrowSettings.leafRegrowthRate / 2;
-        int max = ModConfig.regrowSettings.leafRegrowthRate * 3 / 2;
+        int min = ConfigManager.General.leafRegrowthRate.get() / 2;
+        int max = ConfigManager.General.leafRegrowthRate.get() * 3 / 2;
         int seconds = ThreadLocalRandom.current().nextInt(min, max);
         int ticks = TimeUtil.TICKS_PER_SECOND * seconds;
-        if (ModConfig.zdebugging.debug)
-        {
-            ticks = (int)((double)ticks * ModConfig.zdebugging.regrowModifier);
-        }
+        ticks = (int)((double)ticks * ConfigManager.Debugging.regrowModifier.get());
         return ticks;
     }
 
@@ -43,19 +40,19 @@ public class LeavesRepairManager extends RepairManager
         return getRandomTicksToRepair();
     }
     
-    public boolean isBlockToRepair(Block block, IBlockState blockstate, World world, BlockPos pos)
+    public boolean isBlockToRepair(Block block, BlockState blockstate, IWorld world, BlockPos pos)
     {
-        return (block.isLeaves(blockstate, world, pos) || (block instanceof BlockLeaves));
+        return LeafUtil2.isLeaves(world, pos);
     }
     
-    public boolean isTemporaryBreak(EntityPlayer player)
+    public boolean isTemporaryBreak(PlayerEntity player)
     {
         return player.getHeldItemMainhand().isEmpty()
                 || (player.getHeldItemMainhand().getItem() != Items.SHEARS);
     }
 
     @Override
-    public boolean shouldRepair(EntityPlayer player, Block block, IBlockState blockstate, World world, BlockPos pos)
+	public boolean shouldRepair(PlayerEntity player, Block block, BlockState blockstate, IWorld world, BlockPos pos)
     {
         return isBlockToRepair(block, blockstate, world, pos) && isTemporaryBreak(player);
     }
