@@ -1,5 +1,8 @@
 package com.wumple.util.blockrepair;
 
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 
 import com.wumple.flourishingfoliage.ConfigManager;
@@ -10,11 +13,17 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.concurrent.TickDelayedTask;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.LogicalSidedProvider;
 
 /*
  * Originally based on CoroUtil's BlockRepairingBlock
@@ -59,26 +68,22 @@ public class RepairManager
 	 */
 	protected IRepairingTimes replaceBlockAndBackup(IWorld world, BlockPos pos, int ticksToRepair)
 	{
-		BlockState oldState = world.getBlockState(pos);
-		float oldHardness = oldState.getBlockHardness(world, pos);
-		float oldExplosionResistance = 1;
-		try
-		{
-			oldExplosionResistance = oldState.getBlock().getExplosionResistance(oldState, world, pos, null, null);
-		}
-		catch (Exception ex)
-		{
+		RepairingState rstate = new RepairingState(world, pos, ticksToRepair);
 
-		}
+		return setupRepairingBlock(rstate, world, pos);
+	}
 
+	protected IRepairingTimes setupRepairingBlock(RepairingState rstate, IWorld world, BlockPos pos)
+	{
 		world.setBlockState(pos, getRepairingBlock().getDefaultState(), 3);
+
 		TileEntity tEnt = world.getTileEntity(pos);
 		IRepairing repairing = Util.as(tEnt, IRepairing.class);
 		if (repairing != null)
 		{
 			// BlockState state = world.getBlockState(pos);
-			RepairManager.log("set repairing block for pos: " + pos + ", " + oldState.getBlock());
-			repairing.init(world, ticksToRepair, oldState, oldHardness, oldExplosionResistance);
+			RepairManager.log("set repairing block for pos: " + pos + ", " + rstate.orig_blockState.getBlock());
+			repairing.setRepairingState(rstate);
 			return repairing;
 		}
 		else
@@ -155,13 +160,70 @@ public class RepairManager
 			event.setCanceled(true);
 		}
 	}
-	
-	/*
-	// TODO Explosions
+
+	// after explosions, make sure block to put repairing block into is air and not already repairing block
+	protected boolean isBlockOkayForRepairingBlock(World world, BlockPos pos)
+	{
+		boolean isOkay = world.getBlockState(pos).isAir(world, pos);
+
+		if (isOkay)
+		{
+			TileEntity tEnt = world.getTileEntity(pos);
+			isOkay = !(tEnt instanceof IRepairing);
+		}
+
+		return isOkay;
+	}
+
 	public void onDetonate(ExplosionEvent.Detonate event)
 	{
+		// only handle replacement on server
+		if (event.getWorld().isRemote())
+		{
+			return;
+		}
+
+		PlayerEntity player = null;
+		World world = event.getWorld();
+		int ticksToRepair = getTicksToRepair();
+
+		HashMap<BlockPos, RepairingState> pendingRepairs = new HashMap<BlockPos, RepairingState>();
+
+		// remember data for all potentially repairable blocks in explosion
+		List<BlockPos> positions = event.getAffectedBlocks();
+		for (BlockPos pos : positions)
+		{
+			BlockState blockstate = world.getBlockState(pos);
+			Block block = blockstate.getBlock();
+
+			// check if should replace with repairing block
+			if (shouldRepair(player, block, blockstate, world, pos))
+			{
+				pendingRepairs.put(pos, new RepairingState(world, pos, ticksToRepair));
+			}
+		}
+
+		// create repairing blocks later after explosion finished
+		MinecraftServer server = LogicalSidedProvider.INSTANCE.get(LogicalSide.SERVER);
+		if (server != null)
+		{
+			server.enqueue(new TickDelayedTask(server.getTickCounter(), 
+					new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					pendingRepairs.forEach((p, s) -> {
+						if (isBlockOkayForRepairingBlock(world, p))
+						{
+							setupRepairingBlock(s, world, p);
+						}
+					});
+				}
+			}) );
+		}
+
 	}
-	*/
 
 	// TODO Fire - but no event to handle!
 }

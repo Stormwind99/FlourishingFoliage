@@ -14,6 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class LeavesRepairManager extends RepairManager
@@ -47,7 +48,7 @@ public class LeavesRepairManager extends RepairManager
     
     public boolean isTemporaryBreak(PlayerEntity player)
     {
-        return player.getHeldItemMainhand().isEmpty()
+        return (player == null) || player.getHeldItemMainhand().isEmpty()
                 || (player.getHeldItemMainhand().getItem() != Items.SHEARS);
     }
 
@@ -63,6 +64,13 @@ public class LeavesRepairManager extends RepairManager
     {
         super.onBreak(event);
     }
+
+    @Override
+    @SubscribeEvent
+	public void onDetonate(ExplosionEvent.Detonate event)
+	{
+    	super.onDetonate(event);
+	}
     
     /*
      * TODO Consider handling explosionEvent and repairing any leaves (assuming tree survives)

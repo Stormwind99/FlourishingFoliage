@@ -8,28 +8,19 @@ import javax.annotation.Nullable;
 
 import com.wumple.util.misc.LeafUtil2;
 
-/*
- * Based on CoroUtil's TileEntityRepairingBlock
- * from https://github.com/Corosauce/CoroUtil
- */
-
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraftforge.registries.ForgeRegistries;
 
 /*
  * Originally based on CoroUtil's BlockRepairingBlock
@@ -37,16 +28,7 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 public class TileEntityRepairingBlock extends TileEntity implements ITickableTileEntity, IRepairing
 {
-	// block state to restore later
-	protected BlockState orig_blockState;
-
-	// cached values of original block to use for this tile entity's block
-	protected float orig_hardness = 1;
-	protected float orig_explosionResistance = 1;
-
-	// when to restore state
-	protected long timeToRepairAt = 0;
-	protected long creationTime = 0;
+	protected RepairingState repairState = new RepairingState();
 
 	public TileEntityRepairingBlock()
 	{
@@ -60,12 +42,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 
 	public void setTicksToRepair(IWorld world, int ticksToRepair)
 	{
-		long currentTime = world.getWorld().getGameTime();
-		if (creationTime == 0)
-		{
-			creationTime = currentTime;
-		}
-		timeToRepairAt = currentTime + ticksToRepair;
+		repairState.setTicksToRepair(world.getWorld().getGameTime(), ticksToRepair);
 		markDirty();
 	}
 
@@ -80,50 +57,36 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 	@Override
 	public long getTimeToRepairAt()
 	{
-		return timeToRepairAt;
+		return repairState.timeToRepairAt;
 	}
 
 	@Override
 	public long getTimeToGiveUpAt()
 	{
-		long timeExpiration = 0;
-		long exp = getExpirationTimeLength();
-		if ((creationTime != 0) && (exp > 0))
-		{
-			timeExpiration = creationTime + exp;
-		}
-		return timeExpiration;
+		return repairState.getTimeToGiveUpAt(getExpirationTimeLength());
 	}
 
 	protected boolean isTimeToRepair()
 	{
-		long currentTime = getWorld().getGameTime();
-		return (currentTime >= timeToRepairAt);
+		return repairState.isTimeToRepair(getWorld().getGameTime());
 	}
 
 	public boolean isTimeToGiveUp()
 	{
-		long timeExpiration = getTimeToGiveUpAt();
-		if (timeExpiration > 0)
-		{
-			long currentTime = getWorld().getGameTime();
-			return (currentTime >= timeExpiration);
-		}
-
-		return false;
+		return repairState.isTimeToGiveUp(getExpirationTimeLength(), getWorld().getGameTime());
 	}
 
 	protected boolean isDataInvalid()
 	{
-		return orig_blockState == null || orig_blockState == this.getBlockState();
+		return repairState.isDataInvalid(this.getBlockState());
 	}
 
 	// override to change behavior when determining if block is repairable now
 	protected boolean canRepairBlock()
 	{
 		// don't repair now if any Entity's are in our bounds
-		//AxisAlignedBB aabb = this.getBlockState().getCollisionShape(this.getWorld(), this.getPos()).getBoundingBox();
-		AxisAlignedBB aabb = orig_blockState.getCollisionShape(this.getWorld(), this.getPos()).getBoundingBox();
+		AxisAlignedBB aabb = repairState.orig_blockState.getCollisionShape(this.getWorld(), this.getPos())
+				.getBoundingBox();
 		aabb = aabb.offset(this.getPos());
 		List<LivingEntity> listTest = this.getWorld().getEntitiesWithinAABB(LivingEntity.class, aabb);
 		return (listTest.size() == 0);
@@ -150,7 +113,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 	// override to change behavior of restoring a block
 	protected void coreRestoreBlock()
 	{
-		getWorld().setBlockState(this.getPos(), orig_blockState);
+		getWorld().setBlockState(this.getPos(), repairState.orig_blockState);
 		markDirty();
 	}
 
@@ -207,7 +170,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 	// returns true)
 	protected void restoreBlock()
 	{
-		RepairManager.log("restoring block to state: " + orig_blockState + " at " + this.getPos());
+		RepairManager.log("restoring block to state: " + repairState.orig_blockState + " at " + this.getPos());
 		preRestoreBlock();
 		coreRestoreBlock();
 		postRestoreBlock();
@@ -215,7 +178,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 
 	protected void giveUp()
 	{
-		RepairManager.log("giving up on state: " + orig_blockState + " at " + this.getPos());
+		RepairManager.log("giving up on state: " + repairState.orig_blockState + " at " + this.getPos());
 		getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
 		markDirty();
 		this.markDirty();
@@ -232,8 +195,8 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 				// if for some reason data is invalid, remove block
 				if (isDataInvalid())
 				{
-					RepairManager.log("invalid state for repairing block, removing, orig_blockState: " + orig_blockState
-							+ " vs " + this.getBlockState());
+					RepairManager.log("invalid state for repairing block, removing, orig_blockState: "
+							+ repairState.orig_blockState + " vs " + this.getBlockState());
 					giveUp();
 				}
 				else
@@ -258,20 +221,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 	@Override
 	public CompoundNBT write(CompoundNBT var1)
 	{
-		if (orig_blockState != null)
-		{
-			ResourceLocation loc = ForgeRegistries.BLOCKS.getKey(this.orig_blockState.getBlock());
-			var1.putString("orig_blockName", loc.toString());
-
-			CompoundNBT stateNBT = NBTUtil.writeBlockState(this.orig_blockState);
-			var1.put("orig_blockState2", stateNBT);
-		}
-		var1.putLong("timeToRepairAt", timeToRepairAt);
-		var1.putLong("creationTime", creationTime);
-
-		var1.putFloat("orig_hardness", orig_hardness);
-		var1.putFloat("orig_explosionResistance", orig_explosionResistance);
-
+		repairState.write(var1);
 		return super.write(var1);
 	}
 
@@ -279,56 +229,23 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 	public void read(CompoundNBT var1)
 	{
 		super.read(var1);
-		timeToRepairAt = var1.getLong("timeToRepairAt");
-		creationTime = var1.getLong("creationTime");
-		try
-		{
-			Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(var1.getString("orig_blockName")));
-			if (block != null)
-			{
-				this.orig_blockState = NBTUtil.readBlockState(var1.getCompound("orig_blockState2"));
-			}
-		}
-		catch (Exception ex)
-		{
-			if (RepairManager.isDebugEnabled())
-			{
-				ex.printStackTrace();
-			}
-
-			this.orig_blockState = Blocks.AIR.getDefaultState();
-		}
-
-		orig_hardness = var1.getFloat("orig_hardness");
-		orig_explosionResistance = var1.getFloat("orig_explosionResistance");
+		repairState.read(var1);
 	}
 
 	/*
 	 * Original block (to repair) data accessors
 	 */
 
-	public void init(IWorld world, int ticksToRepair, BlockState state, float hardness, float explosionResistance)
+	public void init(IWorld world, int ticksToRepair, BlockState blockstate, float hardness, float explosionResistance)
 	{
-		this.orig_blockState = state;
-		this.orig_hardness = hardness;
-		this.orig_explosionResistance = explosionResistance;
-		setTicksToRepair(world, ticksToRepair);
+		repairState.init(world.getWorld().getGameTime(), ticksToRepair, blockstate, hardness, explosionResistance);
 		markDirty();
 	}
-
-	public BlockState getOrig_blockState()
+	
+	public void setRepairingState(RepairingState newState)
 	{
-		return orig_blockState;
-	}
-
-	public float getOrig_hardness()
-	{
-		return orig_hardness;
-	}
-
-	public float getOrig_explosionResistance()
-	{
-		return orig_explosionResistance;
+		repairState = newState;
+		markDirty();
 	}
 
 	// ----------------------------------------------------------------------
@@ -347,8 +264,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 	public CompoundNBT getUpdateTag()
 	{
 		CompoundNBT ret = super.getUpdateTag();
-		ret.putLong("timeToRepairAt", timeToRepairAt);
-		ret.putLong("creationTime", creationTime);
+		repairState.getUpdateTag(ret);
 		return ret;
 	}
 
@@ -362,8 +278,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickableTil
 	@Override
 	public void handleUpdateTag(CompoundNBT tag)
 	{
-		timeToRepairAt = tag.getLong("timeToRepairAt");
-		creationTime = tag.getLong("creationTime");
+		repairState.handleUpdateTag(tag);
 		super.handleUpdateTag(tag);
 	}
 }
