@@ -3,7 +3,6 @@ package com.wumple.flourishingfoliage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.wumple.flourishingfoliage.repair.LeavesRepairDebug;
 import com.wumple.flourishingfoliage.repair.LeavesRepairManager;
 
 import net.minecraftforge.common.MinecraftForge;

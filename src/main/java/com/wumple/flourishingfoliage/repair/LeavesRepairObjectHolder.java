@@ -1,7 +1,5 @@
 package com.wumple.flourishingfoliage.repair;
 
-import com.wumple.flourishingfoliage.Reference;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
