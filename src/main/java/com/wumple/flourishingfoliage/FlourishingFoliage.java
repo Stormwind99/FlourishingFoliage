@@ -44,7 +44,6 @@ public class FlourishingFoliage
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(getManager());
-		MinecraftForge.EVENT_BUS.register(new LeavesRepairDebug());
 	}
 	
 	public void setup(final FMLCommonSetupEvent event)
