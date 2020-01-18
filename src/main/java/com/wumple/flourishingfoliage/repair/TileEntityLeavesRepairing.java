@@ -2,7 +2,7 @@ package com.wumple.flourishingfoliage.repair;
 
 import com.wumple.flourishingfoliage.ConfigManager;
 import com.wumple.util.blockrepair.TileEntityRepairingBlock;
-import com.wumple.util.misc.LeafUtil2;
+import com.wumple.util.misc.LeafUtil;
 import com.wumple.util.misc.TimeUtil;
 
 import net.minecraft.tileentity.TileEntityType;
@@ -41,7 +41,7 @@ public class TileEntityLeavesRepairing extends TileEntityRepairingBlock
                 super.canRepairBlock()
                 && getWorld().isAreaLoaded(getPos(), 1)
                 && isEnoughLight(getPos())
-                && ((!ConfigManager.General.growOutward.get()) || LeafUtil2.canLeavesGrowAtLocation(getWorld(), getPos())) 
+                && ((!ConfigManager.General.growOutward.get()) || LeafUtil.canLeavesGrowAtLocation(getWorld(), getPos())) 
                 );
     }
     

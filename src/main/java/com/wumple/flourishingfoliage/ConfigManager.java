@@ -77,9 +77,6 @@ public class ConfigManager
 			debug = COMMON_BUILDER.comment("Enable general debug features, display extra debug info").define("debug",
 					false);
 			
-			showRepairingBlocks = COMMON_BUILDER.comment("Make repairing blocks visible").define("showRepairingBlocks",
-					false);
-
 			// @Name("Debug time modifier")
 			regrowModifier = COMMON_BUILDER.comment("Modify regrow speed in debug mode").defineInRange("regrowModifier",
 					1.0F, 0.0F, Double.MAX_VALUE);

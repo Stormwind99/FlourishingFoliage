@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.wumple.flourishingfoliage.ConfigManager;
 import com.wumple.util.blockrepair.RepairManager;
-import com.wumple.util.misc.LeafUtil2;
+import com.wumple.util.misc.LeafUtil;
 import com.wumple.util.misc.TimeUtil;
 
 import net.minecraft.block.Block;
@@ -43,7 +43,7 @@ public class LeavesRepairManager extends RepairManager
     
     public boolean isBlockToRepair(Block block, BlockState blockstate, IWorld world, BlockPos pos)
     {
-        return LeafUtil2.isLeaves(world, pos);
+        return LeafUtil.isLeaves(world, pos);
     }
     
     public boolean isTemporaryBreak(PlayerEntity player)
