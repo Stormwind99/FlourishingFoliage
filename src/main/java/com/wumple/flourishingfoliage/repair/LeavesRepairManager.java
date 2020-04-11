@@ -67,13 +67,8 @@ public class LeavesRepairManager extends RepairManager
 
     @Override
     @SubscribeEvent
-	public void onDetonate(ExplosionEvent.Detonate event)
-	{
-    	super.onDetonate(event);
-	}
-    
-    /*
-     * TODO Consider handling explosionEvent and repairing any leaves (assuming tree survives)
-     * See CoroUtil.forge.EventHandlerForge#explosionEvent for example
-     */
+    public void onDetonate(ExplosionEvent.Detonate event)
+    {
+        super.onDetonate(event);
+    }
 }
